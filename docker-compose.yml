@@ -1,0 +1,84 @@
+services:
+
+  # PostgreSQL database for our services
+  database:
+    build: ./database
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    env_file:
+      - ./database/.env
+
+  # LABO 01: model training service
+  train-deploy:
+    build: ./l1-train-and-deploy
+    depends_on:
+      orchestration:
+        condition: service_healthy
+      experiment-tracking:
+        condition: service_started
+
+  # LABO 02: MLFlow server for experiment tracking (uses the database)
+  experiment-tracking:
+    build: ./l2-backend-experiment-tracking
+    ports:
+      - 5000:5000
+    depends_on:
+      - database
+
+  # LABO 03: prefect server
+  orchestration:
+    build: ./l3-backend-orchestration
+    ports:
+      - 4200:4200
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4200/api/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  
+  # LABO 04: web service
+  web-service:
+    build: ./l4-deploy-web-api
+    ports:
+      - "9696:9696"
+    depends_on:
+      orchestration:
+        condition: service_healthy
+    volumes:
+      - batch-data:/batch-data
+
+  # LABO 05: batch service
+  ## restart service: docker compose up --build --force-recreate --no-deps -d batch-service
+  batch-service:
+    build: ./l5-deploy-batch
+    depends_on:
+      orchestration:
+        condition: service_healthy
+    volumes:
+      - batch-data:/batch-data
+
+  # LABO 06: monitoring
+  # grafana server
+  # default login: admin/admin
+  grafana:
+    image: grafana/grafana
+    restart: unless-stopped
+    volumes:
+      - batch-data:/batch-data
+      - grafana-data-config-datasources:/etc/grafana/provisioning/datasources:ro
+      - grafana-data-config-dashboards:/etc/grafana/provisioning/dashboards:ro
+      - grafana-data-dashboards:/opt/grafana/dashboards
+    ports:
+      - "3400:3000"
+
+volumes:
+  # storage for persistent database usage
+  postgres-data:
+  # grafana volumes for persistent configuration and datastorage
+  grafana-data-config-datasources:
+  grafana-data-config-dashboards:
+  grafana-data-dashboards:
+  batch-data:
