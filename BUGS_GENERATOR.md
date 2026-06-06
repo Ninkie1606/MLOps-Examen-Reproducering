@@ -30,7 +30,7 @@ Elk symptoom is één paragraaf.
 ### 2. `BUGS.md` — voor de docent (antwoorden)
 
 Bevat de **volledige uitleg** per bug: exacte bestand, lijn, wat er fout is en wat de correcte code moet zijn.
-Dit mag de student **niet** zien — dit is om na te kijken.
+Dit mag de student **niet** zien — dit is om na te kijken. Dit zijn voorbeeld bugs. Maak zelf nieuwe unieke bugs en geef er een goed beschreven sympoon bij net zoals je bij deze ziet. Soms mag je eens dezelfde bugs als deze gebruiken maar probeer het zeker te minimalizeren.
 
 **Structuur:**
 
