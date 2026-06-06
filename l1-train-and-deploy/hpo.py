@@ -7,6 +7,7 @@ from optuna.samplers import TPESampler
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import root_mean_squared_error
 
+mlflow.set_tracking_uri("http://experiment-tracking:5000")
 
 
 def load_pickle(filename):
@@ -16,7 +17,7 @@ def load_pickle(filename):
 
 def run_optimization(data_path: str, num_trials: int):
 
-    mlflow.set_experiment("Random-Forest-HPO")
+    mlflow.set_experiment("random-forest-hpo")
     mlflow.sklearn.autolog(disable=True)
 
     X_train, y_train = load_pickle(os.path.join(data_path, "train.pkl"))

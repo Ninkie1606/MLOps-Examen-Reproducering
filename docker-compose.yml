@@ -42,6 +42,7 @@ services:
   # LABO 04: web service
   web-service:
     build: ./l4-deploy-web-api
+    restart: unless-stopped
     ports:
       - "9696:9696"
     depends_on:

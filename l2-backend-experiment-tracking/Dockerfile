@@ -11,6 +11,7 @@ CMD ["mlflow", "server", \
      "--host", "0.0.0.0", \
      "--port", "5000", \
      "--backend-store-uri", "postgresql+psycopg2://postgres:postgres@database/mlflow_db", \
+     "--default-artifact-root", "mlflow-artifacts:/", \
      "--allowed-hosts", "*"]
 
 # --host omdat mlflow anders op 127.0.0.1 runt, en de port niet kan exposen naar buiten
