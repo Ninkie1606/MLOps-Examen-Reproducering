@@ -21,14 +21,13 @@ RF_PARAMS = [
     "n_jobs",
 ]
 
-mlflow.set_tracking_uri("http://experiment-tracking:5000")
 
 
 def read_dataframe(filename: str):
     df = pd.read_parquet(filename)
 
     df["duration"] = df.lpep_dropoff_datetime - df.lpep_pickup_datetime
-    df.duration = df.duration.dt.total_seconds() / 60
+    df.duration = df.duration.dt.total_seconds() / 3600
     df = df[(df.duration >= 1) & (df.duration <= 60)]
 
     categorical = ["PULocationID", "DOLocationID"]
@@ -91,13 +90,13 @@ def run_register_model(data_path: str, top_n: int):
         experiment_ids=experiment.experiment_id,
         run_view_type=ViewType.ACTIVE_ONLY,
         max_results=top_n,
-        order_by=["metrics.rmse ASC"],
+        order_by=["metrics.rmse DESC"],
     )[0]
 
     # Register the best model
     run_id = best_run.info.run_id
     model_uri = f"runs:/{run_id}/model"
-    mlflow.register_model(model_uri, name="rf-best-model")
+    mlflow.register_model(model_uri, name="rf-prod-model")
 
 
 if __name__ == "__main__":
